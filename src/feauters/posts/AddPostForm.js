@@ -1,12 +1,25 @@
 import React from "react";
 import { useState } from "react";
+import { postAdded } from "./postSlice";
+import { nanoid } from "@reduxjs/toolkit";
+import { useDispatch } from "react-redux";
 
 const AddPostForm = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const dispatch = useDispatch();
 
   const onTitleChanged = (e) => setTitle(e.target.value);
   const onContentChanged = (e) => setContent(e.target.value);
+
+  const onButtonClicked = () => {
+    if (title && content) {
+      dispatch(postAdded(title, content));
+
+      setTitle("");
+      setContent("");
+    }
+  };
 
   return (
     <section>
@@ -34,6 +47,10 @@ const AddPostForm = () => {
           value={content}
           onChange={onContentChanged}
         />
+
+        <button type="button" onClick={onButtonClicked}>
+          Set
+        </button>
       </form>
     </section>
   );

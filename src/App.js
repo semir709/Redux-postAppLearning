@@ -1,10 +1,12 @@
 import "./App.css";
-import PostList from "./feauters/PostList";
+import AddPostForm from "./feauters/posts/AddPostForm";
+import PostList from "./feauters/posts/PostList";
 
 function App() {
   return (
     <div>
       <PostList />
+      <AddPostForm />
     </div>
   );
 }
