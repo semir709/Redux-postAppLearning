@@ -5,13 +5,11 @@ import { useSelector } from "react-redux";
 const ShowAuthor = ({ userId }) => {
   const allAuthors = useSelector(selectAllUsers);
 
-  const author = allAuthors.filter((user) => user.id === userId);
-
-  console.log(author[0]?.name);
+  const author = allAuthors.find((user) => user.id === userId);
 
   return (
     <div className="my-4">
-      <span>By {author.length === 0 ? "Unknown user" : author[0]?.name}</span>
+      <span>By {!author ? "Unknown user" : author.name}</span>
     </div>
   );
 };
