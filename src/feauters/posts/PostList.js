@@ -7,7 +7,9 @@ import DatePublished from "./DatePublished";
 const PostList = () => {
   const posts = useSelector(selectAllPosts);
 
-  const allPosts = posts.map(({ id, title, content, date, userId }) => (
+  const orderPosts = posts.slice().sort((a, b) => b.date.localeCompare(a.date));
+
+  const allPosts = orderPosts.map(({ id, title, content, date, userId }) => (
     <article className="my-4 bg-green-400 p-4" key={id}>
       <h3 className="text-2xl font-semibold">{title}</h3>
       <p>{content.substring(0, 100)}</p>
