@@ -18,12 +18,13 @@ export const postSlice = createSlice({
       reducer(state, action) {
         state.push(action.payload);
       },
-      prepare(title, content) {
+      prepare(title, content, user) {
         return {
           payload: {
             id: nanoid(),
             title,
             content,
+            userId: user,
           },
         };
       },
