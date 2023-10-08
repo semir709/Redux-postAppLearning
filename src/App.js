@@ -5,8 +5,8 @@ import PostList from "./feauters/posts/PostList";
 function App() {
   return (
     <div>
-      <PostList />
       <AddPostForm />
+      <PostList />
     </div>
   );
 }

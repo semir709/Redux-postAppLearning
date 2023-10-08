@@ -16,6 +16,14 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   return response.data;
 });
 
+export const addNewPost = createAsyncThunk(
+  "posts/addNewPost",
+  async (initialState) => {
+    const response = await axios.post(POSTS_URL, initialState);
+    return response.data;
+  }
+);
+
 export const postSlice = createSlice({
   name: "posts",
   initialState,
@@ -54,36 +62,58 @@ export const postSlice = createSlice({
   },
 
   extraReducers(builder) {
-    builder.addCase(fetchPosts.pending, (state, action) => {
-      state.status = "loading";
-    });
+    builder
+      .addCase(fetchPosts.pending, (state, action) => {
+        state.status = "loading";
+      })
+      .addCase(fetchPosts.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        // Adding date and reactions
+        let min = 1;
+        const loadedPosts = action.payload.map((post) => {
+          post.date = sub(new Date(), { minutes: min++ }).toISOString();
+          post.reactions = {
+            thumbsUp: 0,
+            wow: 0,
+            heart: 0,
+            rocket: 0,
+            coffee: 0,
+          };
+          return post;
+        });
 
-    builder.addCase(fetchPosts.fulfilled, (state, action) => {
-      state.status = "succeeded";
+        // Add any fetched posts to the array
+        state.posts = state.posts.concat(loadedPosts);
+      })
+      .addCase(fetchPosts.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(addNewPost.fulfilled, (state, action) => {
+        // Fix for API post IDs:
+        // Creating sortedPosts & assigning the id
+        // would be not be needed if the fake API
+        // returned accurate new post IDs
+        const sortedPosts = state.posts.sort((a, b) => {
+          if (a.id > b.id) return 1;
+          if (a.id < b.id) return -1;
+          return 0;
+        });
+        action.payload.id = sortedPosts[sortedPosts.length - 1].id + 1;
+        // End fix for fake API post IDs
 
-      //Adding data and reaction
-      let min = 1;
-
-      const loadedPosts = action.payload.map((post) => {
-        post.date = sub(new Date(), { minutes: min++ }).toISOString();
-        post.reactions = {
-          thumsUp: 0,
-          wow: 0,
+        action.payload.userId = Number(action.payload.userId);
+        action.payload.date = new Date().toISOString();
+        action.payload.reactions = {
+          thumbsUp: 0,
+          hooray: 0,
           heart: 0,
           rocket: 0,
-          coffee: 0,
+          eyes: 0,
         };
 
-        return post;
+        state.posts.push(action.payload);
       });
-
-      state.posts = state.posts.concat(loadedPosts);
-    });
-
-    builder.addCase(fetchPosts.rejected, (state, action) => {
-      state.status = "failed";
-      state.error = action.error.message;
-    });
   },
 });
 
