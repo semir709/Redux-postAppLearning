@@ -33,6 +33,18 @@ export const updatePost = createAsyncThunk(
   }
 );
 
+export const deletePost = createAsyncThunk(
+  "posts/deletePost",
+  async (initialState) => {
+    const { id } = initialState;
+
+    const response = await axios.delete(`${POSTS_URL}/${id}`);
+
+    if (response?.status === 200) return initialState;
+    return `${response?.status}: ${response?.statusText}`;
+  }
+);
+
 export const postSlice = createSlice({
   name: "posts",
   initialState,
@@ -133,6 +145,16 @@ export const postSlice = createSlice({
         action.payload.date = new Date().toISOString();
         const posts = state.posts.filter((post) => post.id !== id);
         state.posts = [...posts, action.payload];
+      })
+      .addCase(deletePost.fulfilled, (state, action) => {
+        if (!action.payload?.id) {
+          console.log("Delete not completed");
+          console.log(action.payload);
+          return;
+        }
+        const { id } = action.payload;
+        const posts = state.posts.filter((post) => post.id !== id);
+        state.posts = posts;
       });
   },
 });
